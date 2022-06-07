@@ -4,34 +4,35 @@ fetch("http://localhost:3000/api/products")
         return app.json();
     }
 })
-.then(function (value) {
-    console.log(value);
+.then(function (items) {
+    //console.log(items);
 
-    for(item of value) {
+    for(item of items) {
 
         itemLink = document.createElement('a');
-        itemArticle = document.createElement('article')
-        itemImg = document.createElement('img')
-        itemTitle = document.createElement('h3')
-        itemParagraphe = document.createElement('p')
+        itemLink.href = "./product.html?id=" + item._id;
 
+        itemArticle = document.createElement('article');
+        
+        itemImg = document.createElement('img');
+        itemImg.src = item.imageUrl;
+        itemImg.alt = item.altTxt;
 
-        document.getElementById('items').append(itemLink)
-        itemLink.href = "./product.html?id=" + item._id
+        itemTitle = document.createElement('h3');
+        itemTitle.classList = item.name;
+        itemTitle.innerText = item.name;
 
-        itemLink.append(itemArticle)
-        itemArticle.append(itemImg, itemTitle, itemParagraphe)
-
-        itemImg.src = item.imageUrl
-        itemImg.alt = item.altTxt 
-
-        itemTitle.classList = item.name
-        itemTitle.innerText = item.name
-
+        itemParagraphe = document.createElement('p');
         itemParagraphe.classList = "productDescription";
-        itemParagraphe.innerText = item.description
-    }
+        itemParagraphe.innerText = item.description;
 
-    
+
+        document.getElementById('items').append(itemLink);
+
+        itemLink.append(itemArticle);
+        
+        itemArticle.append(itemImg, itemTitle, itemParagraphe);
+
+    }
 
 })
