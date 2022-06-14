@@ -12,7 +12,7 @@ fetch("http://localhost:3000/api/products")
     urlId = url.searchParams.get("id");
    
     // On cherche une correspondance avec l'urlId et l'_id des produits contenue dans l'API
-   for (item of items) {
+   for (let item of items) {
         if (item._id === urlId) {
             rightItem = item;
             break;
@@ -40,10 +40,10 @@ fetch("http://localhost:3000/api/products")
 });
 
 let activeColor = ""; // On défini une varriable et on récupère sa valeur (l45-l48)
-let quantity = 0; // On défini une varriable et on récupère sa valeur (l50-l53)
+let activeQuantity = 0; // On défini une varriable et on récupère sa valeur (l50-l53)
 
 document.getElementById('colors').addEventListener('change', function () {
-    activeColor = this[this.selectedIndex].value;
+    activeColor = this.value;
     //console.log(activeColor);
 });
 
