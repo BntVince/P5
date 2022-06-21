@@ -34,13 +34,13 @@ if (!sessionStorage.panier || !JSON.parse(sessionStorage.panier)[0]) { // Si le 
             let cartItemImg = document.createElement('div');
             let itemImg = document.createElement('img');
 
-            let cartItemContent = document.createElement('div')
-            let cartItemContentDescription = document.createElement('div')
-            let cartItemContentSettings = document.createElement('div')
-            let cartItemContentSettingsQuantity = document.createElement('div')
-            let cartItemContentSettingsDelete = document.createElement('div')
-            let itemQuantity = document.createElement('input')
-            let deleteItem = document.createElement('p')
+            let cartItemContent = document.createElement('div');
+            let cartItemContentDescription = document.createElement('div');
+            let cartItemContentSettings = document.createElement('div');
+            let cartItemContentSettingsQuantity = document.createElement('div');
+            let cartItemContentSettingsDelete = document.createElement('div');
+            let itemQuantity = document.createElement('input');
+            let deleteItem = document.createElement('p');
 
             setAttributes(itemArticle, {'data-id': item._id, 'data-color': kanapInPanier.color});
             itemArticle.classList = 'cart__item';
@@ -49,57 +49,114 @@ if (!sessionStorage.panier || !JSON.parse(sessionStorage.panier)[0]) { // Si le 
 
             itemImg.setAttribute('src', item.imageUrl), ('alt', item.altTxt);
 
-            cartItemContent.classList = 'cart__item__content'
-            cartItemContentDescription.classList = 'cart__item__content__description'
-            cartItemContentDescription.innerHTML += "<h2>"+item.name+"</h2><p>"+kanapInPanier.color+"</p><p>"+item.price+"</p>"
-            cartItemContentSettings.classList = 'cart__item__content__settings'
-            cartItemContentSettingsQuantity.classList = 'cart__item__content__settings__quantity'
-            cartItemContentSettingsQuantity.innerHTML = '<p>Qté : '+kanapInPanier.quantity+'</p>'
-            setAttributes(itemQuantity, {'type': 'number', 'name': 'itemQuantity', 'min': '1', 'max': '100', 'value': kanapInPanier.quantity})
-            itemQuantity.classList = 'itemQuantity'
-            cartItemContentSettingsDelete.classList = 'cart__item__content__settings__delete'
-            deleteItem.innerText = 'Supprimer'
-            deleteItem.classList = 'deleteItem'
+            cartItemContent.classList = 'cart__item__content';
+            cartItemContentDescription.classList = 'cart__item__content__description';
+            cartItemContentDescription.innerHTML += "<h2>"+item.name+"</h2><p>"+kanapInPanier.color+"</p><p>"+item.price+"</p>";
+            cartItemContentSettings.classList = 'cart__item__content__settings';
+            cartItemContentSettingsQuantity.classList = 'cart__item__content__settings__quantity';
+            cartItemContentSettingsQuantity.innerHTML = '<p>Qté : '+kanapInPanier.quantity+'</p>';
+            setAttributes(itemQuantity, {'type': 'number', 'name': 'itemQuantity', 'min': '1', 'max': '100', 'value': kanapInPanier.quantity});
+            itemQuantity.classList = 'itemQuantity';
+            cartItemContentSettingsDelete.classList = 'cart__item__content__settings__delete';
+            deleteItem.innerText = 'Supprimer';
+            deleteItem.classList = 'deleteItem';
 
-            cartItemImg.append(itemImg)
-            cartItemContentSettingsQuantity.append(itemQuantity)
-            cartItemContentSettingsDelete.append(deleteItem)
-            cartItemContentSettings.append(cartItemContentSettingsQuantity, cartItemContentSettingsDelete)
-            cartItemContent.append(cartItemContentDescription, cartItemContentSettings)
-            itemArticle.append(cartItemImg, cartItemContent)
+            cartItemImg.append(itemImg);
+            cartItemContentSettingsQuantity.append(itemQuantity);
+            cartItemContentSettingsDelete.append(deleteItem);
+            cartItemContentSettings.append(cartItemContentSettingsQuantity, cartItemContentSettingsDelete);
+            cartItemContent.append(cartItemContentDescription, cartItemContentSettings);
+            itemArticle.append(cartItemImg, cartItemContent);
 
             cartItems.append(itemArticle);
             // Une fois créer , pour chaque kanap du panier et affiché 
-            totalQuantity += kanapInPanier.quantity // On rajoute le nombre de kanap du panier 
-            totalPrice += item.price * kanapInPanier.quantity // On rejoute le total du ou des kanap du panier
-            writeTot() // On écrit les valeurs obtenu
+            totalQuantity += kanapInPanier.quantity; // On rajoute le nombre de kanap du panier 
+            totalPrice += item.price * kanapInPanier.quantity; // On rejoute le total du ou des kanap du panier
+            writeTot(); // On écrit les valeurs obtenu
 
-            itemQuantity.addEventListener('change', function() {  // Au changement de value de l'un de ceux-ci
+            itemQuantity.addEventListener('change', function() {  // Au changement de value d'un des input "itemQuantity"
                 
-                totalQuantity -= kanapInPanier.quantity 
-                totalQuantity += this.valueAsNumber // On redéfinie la quantité totals
-                totalPrice -= item.price * kanapInPanier.quantity
-                totalPrice += item.price * itemQuantity.valueAsNumber // Et redéfinir le prix total
+                totalQuantity -= kanapInPanier.quantity; 
+                totalQuantity += this.valueAsNumber; // On redéfinie la quantité totals
+                totalPrice -= item.price * kanapInPanier.quantity;
+                totalPrice += item.price * itemQuantity.valueAsNumber; // Et redéfinir le prix total
                         
                 kanapInPanier.quantity = itemQuantity.valueAsNumber // On redéfinie la quantité dans le panier et on modifie la valeurs affiché
-                itemQuantity.closest('article').querySelector('.cart__item__content__settings__quantity p').innerText = 'Qte : ' + itemQuantity.valueAsNumber 
-                writeTot() // On écrit les valeurs obtenu pour le nombres total d'article et le prix total ( que l'on a modifié l90-95)
-                sessionStorage.setItem('panier', JSON.stringify(panier)) // On modifie également le panier présent dans le sessionStorage pour que ce soit enregistré
+                itemQuantity.closest('article').querySelector('.cart__item__content__settings__quantity p').innerText = 'Qte : ' + itemQuantity.valueAsNumber;
+                writeTot(); // On écrit les valeurs obtenu pour le nombres total d'article et le prix total ( que l'on a modifié l90-95)
+                sessionStorage.setItem('panier', JSON.stringify(panier)); // On modifie également le panier présent dans le sessionStorage pour que ce soit enregistré
             })
 
             deleteItem.addEventListener('click', function() { console.log(panier) // Au click sur l'un de ceux-ci
         
-                totalQuantity -= kanapInPanier.quantity
-                totalPrice -= kanapInPanier.quantity * item.price // Et redéfinir le prix total
+                totalQuantity -= kanapInPanier.quantity;
+                totalPrice -= kanapInPanier.quantity * item.price; // Et redéfinir le prix total
                 
-                deleteItem.closest('article').remove() // On supprime l'article affiché
-                writeTot() // On écrit les valeurs obtenu pour le nombres total d'article et le prix total ( que l'on a modifié l115-116)
-                panier.splice(panier.indexOf(kanapInPanier), 1) // On supprime l'article du panier
-                sessionStorage.setItem('panier', JSON.stringify(panier)) // On modifie le panier du sessionStorage
+                deleteItem.closest('article').remove(); // On supprime l'article affiché
+                writeTot(); // On écrit les valeurs obtenu pour le nombres total d'article et le prix total ( que l'on a modifié l115-116)
+                panier.splice(panier.indexOf(kanapInPanier), 1); // On supprime l'article du panier
+                sessionStorage.setItem('panier', JSON.stringify(panier)); // On modifie le panier du sessionStorage
                 if (!sessionStorage.panier || !JSON.parse(sessionStorage.panier)[0]) { // On vérifie si après suppresion il reste des article dans le panier, sinon 
-                    cartItems.innerText = "Votre panier est vide !" // On affiche que le panier est vide
-                }
+                    cartItems.innerText = "Votre panier est vide !"; // On affiche que le panier est vide
+                };
             })
         })
     }
 }
+
+
+
+document.forms[0].addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!sessionStorage.panier || !JSON.parse(sessionStorage.panier)[0]) {
+        alert('Votre panier est vide, veuillez compléter votre panier avant de commander celui-ci!');
+        return false;
+
+    }else{
+        let regexError = false
+        let unexpectedCharacter = /[^a-zA-Z0-9\s]+/
+        let moreThanTreeCharacter = /^[a-zA-Z0-9\s]{0,2}$/
+        let addressStart = /^[^0-9]+/
+        let emailUnexpectedCharacter = /[^a-zA-Z0-9\s\-@\.]+/
+
+        for (let i = 0; i < 4 ; i++) {
+            document.getElementById(this[i].name+'ErrorMsg').innerText = ""
+            if(unexpectedCharacter.exec(this[i].value)) {
+                regexError = true
+                document.getElementById(this[i].name+'ErrorMsg').innerText = "Les caractères spéciaux ne sont pas acceptés"
+                console.log(this[i].name)
+            }else if(moreThanTreeCharacter.exec(this[i].value)) {
+                regexError = true
+                document.getElementById(this[i].name+'ErrorMsg').innerText = "Veuillez renseigner auu moins 3 caractères"
+                console.log(this[i].name)
+            }
+        }
+
+        
+
+        if (regexError) {
+            return false
+        }else{
+
+            let contact ={
+                "firstName": this["firstName"].value,
+                "lastName": this["lastName"].value,
+                "address": this["address"].value,
+                "city": this["city"].value,
+                "email": this["email"].value
+            };
+
+            let products = [];
+
+            for (let kanapInPanier of JSON.parse(sessionStorage.panier)) {
+                products.push(kanapInPanier.id);
+            };
+
+            let command = {"contact": contact, "products": products};
+
+            sessionStorage.setItem('command', JSON.stringify(command));
+
+            console.log(command);
+        }
+    }
+})
