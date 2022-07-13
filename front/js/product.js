@@ -1,8 +1,8 @@
 let urlId // On définie une variable qui va contenir l'id du produit 
 let activeColor = ""; // On défini une varriable et on récupère sa valeur 
 let activeQuantity = 0; // On défini une varriable et on récupère sa valeur 
-// On créer un constructor pour les ajouts dans le panier 
-class addToCart {
+
+class NewCartItems {// On créer un constructor pour les ajouts dans le panier 
     constructor(id, quantity, color) {
         this.id = id;
         this.quantity = quantity;
@@ -10,20 +10,13 @@ class addToCart {
     }
 }
 
-// Ici on récupère l'url de la page actuel et isole l'élement id dans la variable urlId
-const str = document.location.href;
-const url =  new URL(str);
-urlId = url.searchParams.get("id");
+function getUrlId() {// Ici on récupère l'url de la page actuel et isole l'élement id dans la variable urlId
+    let str = document.location.href;
+    let url = new URL(str);
+    urlId = url.searchParams.get("id");
+};
 
-// On appel directement le bon object dans l'API grace à id contenue dans l'url
-fetch("http://localhost:3000/api/products/"+urlId)
-.then(function (app) {
-    if (app.ok) {
-        return app.json();
-    }
-})
-.then(function (item) {
-
+function displayRightProduct(item) {
     document.title = item.name; // On modifi la balise title pour quelle corresponde au nom de l'article
     // On définie l'image et lui donne ses attributs src et alt
     let itemImg = document.createElement('img');
@@ -34,52 +27,100 @@ fetch("http://localhost:3000/api/products/"+urlId)
     document.querySelector('.item__content__titlePrice #title').innerText = item.name;
     document.querySelector('.item__content__titlePrice #price').innerText = item.price;
     document.querySelector('.item__content__description #description').innerText = item.description;
-
-    // Ici on créer une boucle qui va parcourir toute les valeurs possible de color pour intégrer chaqu'une d'elle
-    // dans le menu déroulant 
-    for (color of item.colors) {
+    for (color of item.colors) {// Ici on créer une boucle qui va parcourir toute les valeurs possible de color pour intégrer chaqu'une d'elledans le menu déroulant 
         itemOption = document.createElement('option');
         itemOption.value = color;
         itemOption.innerText = color;
         document.querySelector('.item__content__settings #colors').append(itemOption);
     };
-});
+};
 
-
-document.getElementById('colors').addEventListener('change', function () {
-    activeColor = this.value;
-});
-
-document.getElementById('quantity').addEventListener('change', function() {
-    activeQuantity = this.valueAsNumber;
-})
-//Quand on click sur Ajouter au panier
-document.getElementById('addToCart').addEventListener('click', function() {
-    //Si aucune couleur ou aucune quantité à ajouter n'est sélectionner 
-    if(activeColor == "" || activeQuantity == 0) {
-        alert("Veuillez sélectionner une couleur et le nombre de Kanap que vous souhaitez commander")
-    }else{
-       
-        let panier = []; // On déclare panier qui va contenir sous forme de tableau les objets
-        let addKanap; // On déclare l'objet qui sera ajouté au panier si ajout il y a
-        let itemUpdate = false; // On créer une variable qui nous servira à déterminer si au click on créer un nouvelobjet ou l'on met à jour un déja existant
-        if(sessionStorage.panier) { // Si un panier existe déja dans le sessionStorage
-            panier = JSON.parse(sessionStorage.panier); // On le récupère et l'associe au tableau panier créer 
-
-            for (kanap of panier) { // Pour chaque objet déja présent dans le panier on regarde 
-                if(kanap.id == urlId && kanap.color == activeColor) { // Si l'objet rajouter existe déja dans celui-ci au quel cas 
-                    kanap.quantity += activeQuantity; // On modifie la quantité de l'objet du panier pour  y rajouter la valeur sélectionner 
-                    itemUpdate = true; // On défini que l'on a modifier un objet
-                }
+// On appel directement le bon object dans l'API grace à id contenue dans l'url
+function getRightProduct(productId) {
+    fetch("http://localhost:3000/api/products/" + productId)
+        .then(function (app) {
+            if (app.ok) {
+                return app.json();
             }
-            if(!itemUpdate) { // Si on n'a pas modifier d'objet
-            addKanap = new addToCart (urlId, activeQuantity, activeColor); // On créer un nouvelle objet à ajouter
-            panier.push(addKanap); // On met l'objet dans le panier
-            }
-        }else{
-            addKanap = new addToCart (urlId, activeQuantity, activeColor); // On créer un nouvelle objet à ajouter
-            panier.push(addKanap); // On met l'objet dans le panier
-        }
-    sessionStorage.setItem("panier", JSON.stringify(panier)) // Pour finir on stock le panier dans sessionStorage
-    }
-})
+        })
+        .then(function (item) {
+            displayRightProduct(item);
+        });
+};
+
+function changeActiveColor() {
+    document.getElementById('colors').addEventListener('change', function () {
+        activeColor = this.value;
+    });
+};
+
+function changeActiveQuantity() {
+    document.getElementById('quantity').addEventListener('change', function () {
+        activeQuantity = this.valueAsNumber;
+    });
+};
+
+function alertUserToChooseSetings() {
+    alert("Veuillez sélectionner une couleur et le nombre de Kanap que vous souhaitez commander")
+};
+
+function checkForExistingProduct(cart) {
+    for (kanap of cart) { // Pour chaque objet déja présent dans le panier on regarde 
+        if (kanap.id == urlId && kanap.color == activeColor) { // Si l'objet rajouter existe déja dans celui-ci au quel cas 
+            modifyExistingProduct();
+            return true;
+        };
+    };
+    return false
+};
+
+function modifyExistingProduct() {
+    kanap.quantity = activeQuantity; // On modifie la quantité de l'objet du panier pour  y rajouter la valeur sélectionner 
+};
+
+function addNewProductInCart(newProduct, cart) {
+    newProduct = new NewCartItems(urlId, activeQuantity, activeColor); // On créer un nouvelle objet à ajouter
+    cart.push(newProduct); // On met l'objet dans le panier
+};
+
+function exportCart(cart) {
+    sessionStorage.setItem("panier", JSON.stringify(cart)) // Pour finir on stock le panier dans sessionStorage
+};
+
+function importCart() {
+    return JSON.parse(sessionStorage.panier); // On le récupère et l'associe au tableau panier créer
+
+};
+
+function addToCart() {
+    document.getElementById('addToCart').addEventListener('click', function () {//Quand on click sur Ajouter au panier
+        if (activeColor == "" || activeQuantity == 0) { //Si aucune couleur ou aucune quantité à ajouter n'est sélectionner 
+            alertUserToChooseSetings();
+        } else {
+            let panier = []; // On déclare panier qui va contenir sous forme de tableau les objets
+            let addKanap; // On déclare l'objet qui sera ajouté au panier si ajout il y a
+            if (sessionStorage.panier) { // Si un panier existe déja dans le sessionStorage
+
+                panier = importCart();
+                if (!checkForExistingProduct(panier)) { // Si l'utilisateur ajoute un produit qui n'existe pas déjà dans le panier
+                    addNewProductInCart(addKanap, panier);
+                };
+            } else {
+                addNewProductInCart(addKanap, panier);
+            };
+            exportCart(panier);
+        };
+    });
+};
+
+//--------------------------------------------------------------------------------------------------//
+
+getUrlId();
+
+getRightProduct(urlId);
+
+changeActiveColor();
+
+changeActiveQuantity();
+
+addToCart();

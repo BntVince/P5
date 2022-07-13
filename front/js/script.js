@@ -1,13 +1,5 @@
-fetch("http://localhost:3000/api/products")
-.then(function (app) {
-    if (app.ok) {
-        return app.json();
-    }
-})
-.then(function (items) {
-    //console.log(items);
-
-    for(item of items) { // pour chaque élément du array que retourne l'API =>
+function displayProducts(items, conteneurSelector) {
+    for (item of items) { // pour chaque élément du array que retourne l'API =>
         //On défini le lien et son href
         let itemLink = document.createElement('a');
         itemLink.href = "./product.html?id=" + item._id;
@@ -27,12 +19,25 @@ fetch("http://localhost:3000/api/products")
         itemParagraphe.innerText = item.description;
 
         //On sélectionne l'élément dans le quel on créer un lien ("itemLink l12-13")
-        document.getElementById('items').append(itemLink);
+        document.querySelector(conteneurSelector).append(itemLink);
         //On créer un article ("itemArticle l15") dans le lien créer plus haut 
         itemLink.append(itemArticle);
         //On créer une Image, un Titre et un Paragraphe ("itemImg l17-19", "itemTitle l21-23", "itemParagraphe l25--27" )
         itemArticle.append(itemImg, itemTitle, itemParagraphe);
 
     }
+}
 
-})
+function getProducts() {
+    fetch("http://localhost:3000/api/products")
+        .then(function (app) {
+            if (app.ok) {
+                return app.json();
+            }
+        })
+        .then(function (items) {
+            displayProducts(items, '#items')
+        })
+}
+
+getProducts();

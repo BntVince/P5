@@ -16,6 +16,7 @@ function writeTot() { // On créer une fonction qui va modifier sur la pages les
 
 let formCommand = document.forms[0]; // On créer formCommand qui correspond au formulaire
 let regexError = false; // On créer regexError qui nous permettra de savoir si il y a une erreur de saisi
+
 let regexCheckList = { // On créer une liste des diférent regex à checker
     unexpectedCharacter: /[^a-zA-Z\s\-]+/,
     moreThanTreeCharacter: /^[a-zA-Z\s]{0,2}$/,
@@ -91,7 +92,7 @@ if (!sessionStorage.panier || !JSON.parse(sessionStorage.panier)[0]) { // Si le 
 
             cartItemContent.classList = 'cart__item__content';
             cartItemContentDescription.classList = 'cart__item__content__description';
-            cartItemContentDescription.innerHTML += "<h2>"+item.name+"</h2><p>"+kanapInPanier.color+"</p><p>"+item.price+"</p>";
+            cartItemContentDescription.innerHTML += "<h2>"+item.name+"</h2><p>"+kanapInPanier.color+"</p><p>"+item.price+" €</p>";
             cartItemContentSettings.classList = 'cart__item__content__settings';
             cartItemContentSettingsQuantity.classList = 'cart__item__content__settings__quantity';
             cartItemContentSettingsQuantity.innerHTML = '<p>Qté : '+kanapInPanier.quantity+'</p>';
