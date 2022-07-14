@@ -1,17 +1,31 @@
-fetch("http://localhost:3000/api/products/order", {
+function postJsonToAPI(jsonToPost) {
+  fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
-      'Accept': 'application/json', 
+      'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
-    body: sessionStorage.command
+    body: jsonToPost
   })
-  .then(function (rep) {
-    if (rep.ok) {
+    .then(function (rep) {
+      if (rep.ok) {
         return rep.json();
-    }
-  })
-.then(function (res) {
-    document.getElementById('orderId').innerText = res.orderId
-    sessionStorage.removeItem('command')
-  })
+      }
+    })
+    .then(function (resultat) {
+      displayOrderId(resultat);
+      deleteCommand('command');
+    })
+}
+
+function displayOrderId(responseFromApi) {
+  document.getElementById('orderId').innerText = responseFromApi.orderId
+}
+
+function deleteCommand(command) {
+  sessionStorage.removeItem(command)
+}
+
+//-----------------------------------------------------------------------------//
+
+postJsonToAPI(sessionStorage.command);

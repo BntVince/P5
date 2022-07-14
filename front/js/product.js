@@ -84,11 +84,11 @@ function addNewProductInCart(newProduct, cart) {
 };
 
 function exportCart(cart) {
-    sessionStorage.setItem("panier", JSON.stringify(cart)) // Pour finir on stock le panier dans sessionStorage
+    sessionStorage.setItem("panierOfKanap9959", JSON.stringify(cart)) // Pour finir on stock le panier dans sessionStorage
 };
 
 function importCart() {
-    return JSON.parse(sessionStorage.panier); // On le récupère et l'associe au tableau panier créer
+    return JSON.parse(sessionStorage.panierOfKanap9959); // On le récupère et l'associe au tableau panier créer
 
 };
 
@@ -99,7 +99,7 @@ function addToCart() {
         } else {
             let panier = []; // On déclare panier qui va contenir sous forme de tableau les objets
             let addKanap; // On déclare l'objet qui sera ajouté au panier si ajout il y a
-            if (sessionStorage.panier) { // Si un panier existe déja dans le sessionStorage
+            if (sessionStorage.panierOfKanap9959) { // Si un panier existe déja dans le sessionStorage
 
                 panier = importCart();
                 if (!checkForExistingProduct(panier)) { // Si l'utilisateur ajoute un produit qui n'existe pas déjà dans le panier
