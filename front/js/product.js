@@ -13,7 +13,7 @@ class NewCartItems {// On créer un constructor pour les ajouts dans le panier
 function getUrlId() {// Ici on récupère l'url de la page actuel et isole l'élement id dans la variable urlId
     let str = document.location.href;
     let url = new URL(str);
-    urlId = url.searchParams.get("id");
+    return url.searchParams.get("id");
 };
 
 function displayRightProduct(item) {
@@ -115,7 +115,7 @@ function addToCart() {
 
 //--------------------------------------------------------------------------------------------------//
 
-getUrlId();
+urlId = getUrlId();
 
 getRightProduct(urlId);
 

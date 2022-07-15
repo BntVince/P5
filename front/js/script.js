@@ -18,17 +18,17 @@ function displayProducts(items, conteneurSelector) {
         itemParagraphe.classList = "productDescription";
         itemParagraphe.innerText = item.description;
 
-        //On sélectionne l'élément dans le quel on créer un lien ("itemLink l12-13")
+        //On sélectionne l'élément dans le quel on créer un lien 
         document.querySelector(conteneurSelector).append(itemLink);
         //On créer un article ("itemArticle l15") dans le lien créer plus haut 
         itemLink.append(itemArticle);
-        //On créer une Image, un Titre et un Paragraphe ("itemImg l17-19", "itemTitle l21-23", "itemParagraphe l25--27" )
+        //On créer une Image, un Titre et un Paragraphe
         itemArticle.append(itemImg, itemTitle, itemParagraphe);
 
     }
 }
 
-function getProducts() {
+function getProducts() { // On fait une requête à l'API pour quel nous retourne la liste des produits
     fetch("http://localhost:3000/api/products")
         .then(function (app) {
             if (app.ok) {
@@ -36,7 +36,7 @@ function getProducts() {
             }
         })
         .then(function (items) {
-            displayProducts(items, '#items')
+            displayProducts(items, '#items') // On appel la fonction qui va afficher tous les produits (l1)
         })
 }
 

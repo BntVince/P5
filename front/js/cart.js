@@ -1,4 +1,3 @@
-//--------------------------- UTILISABLE ---------------------------//
 
 //---------------------------- Utilitaire Parti Panier ----------------------------//
 
@@ -151,23 +150,12 @@ function checkForCart() {
     }
 }
 
-//-------------------------------- CODE Parti Panier --------------------------------//
-
-
-if (checkForCart()) { // Si le panier n'existe pas ou est vide
-
-    panier = importCart(); // On le transforme en objet utilisable 
-
-    getAllProductsFromCart(panier);
-
-}
-
 //--------------------------- Utilitaires Parti Formulaire ---------------------------//
 
 let formCommand = document.forms[0]; // On créer formCommand qui correspond au formulaire
 let regexError = false; // On créer regexError qui nous permettra de savoir si il y a une erreur de saisi
 
-let regexCheckList = { // On créer une liste des diférent regex à checker
+let regexCheckList = { // On créer une liste des diférents regex à checker
     unexpectedCharacter: /[^a-zA-Z\s\-]+/,
     moreThanTreeCharacter: /^[a-zA-Z\s]{0,2}$/,
     addressStart: /^[^0-9]+/,
@@ -175,7 +163,7 @@ let regexCheckList = { // On créer une liste des diférent regex à checker
     emailUnexpectedCharacter: /[^a-zA-Z0-9\s\-@\.]+/,
     emailConform: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
 };
-let regexErrorMsg = { // On créer une liste de message d'erreurs
+let regexErrorMsg = { // On créer une liste de messages d'erreurs
     unexpectedCharacterMsg: "Les caractères spéciaux ne sont pas acceptés",
     moreThanTreeCharacterMsg: "Veuillez renseigner au moins 3 caractères",
     addressStartMsg: "L'adresse doit commencer par le numéro de celle-ci",
@@ -183,8 +171,7 @@ let regexErrorMsg = { // On créer une liste de message d'erreurs
     emailConformMsg: "L'adresse email n'est pas conforme, vérifiez votre saisi"
 };
 
-function resetRegex(input) { // On créer une fonction qui sera appelé quand aucune érreur n'est constaté afin
-    regexError = false // de repasser regexError à false (au cas ou il aurai une valeur diffèrente)
+function resetErrorMsg(input) { // On créer une fonction qui sera appelé quand aucune érreur n'est constaté afin
     document.getElementById(input.name + 'ErrorMsg').innerText = "" // et de supprimer un message d'erreur (au cas ou il y en aurai eu un)
 }
 
@@ -192,79 +179,121 @@ function showErrorMsg(input, errorMsg) {
     document.getElementById(input.name + 'ErrorMsg').innerText = errorMsg;
 }
 
-function regexDoubleCheck(input, regexCheck1, regexCheck2, errorMsg1, errorMsg2) { // On créer une fonction capable de checker 2 regex 
+function getRegexError(input, errorMsg) {
+    showErrorMsg(input, errorMsg);
+    return true
+}
+
+function checkForRegexError(input, regexCheck, errorMsg) {
+    if (regexCheck.exec(input.value)) {
+        getRegexError(input, errorMsg)
+        return true
+    } else {
+        return false
+    }
+}
+
+function regexDynamicCheck(input, regexCheck1, regexCheck2, errorMsg1, errorMsg2) { // On créer une fonction capable de checker 2 regex 
     input.addEventListener('input', function () { // Des qu'un utilisateur saisi un caractère
-        if (regexCheck1.exec(input.value)) { // On check le 1er regex et si il correspond
-            regexError = true; // On passe regexError à true pour signaler qu'il y a une erreur (ce qui empèchera l'envoie du formulaire)
-            showErrorMsg(input, errorMsg1); // Et on signale à l'utilisateur sont erreur
-        } else if (regexCheck2.exec(input.value)) { // On check le 2nd regex et répète les mêmes opérations
-            regexError = true;
-            showErrorMsg(input, errorMsg2);
-        } else { // Si aucune erreur est trouvé (correspondance avec les regexs utilisé)
-            resetRegex(input); // On appel la fonction qui supprimera le message d'erruer et repassera regexError à false
-        }
+        regexDoubleCheck(input, regexCheck1, regexCheck2, errorMsg1, errorMsg2)
     });
 }
 
+function regexDoubleCheck(input, regexCheck1, regexCheck2, errorMsg1, errorMsg2) {
+    if (checkForRegexError(input, regexCheck1, errorMsg1)) {
+        return true
+        // On check le 1er regex et si il correspond
+    } else if (checkForRegexError(input, regexCheck2, errorMsg2)) {
+        return true
+        // On check le 2nd regex et répète les mêmes opérations
+    } else { // Si aucune erreur est trouvé (correspondance avec les regexs utilisé)
+        resetErrorMsg(input); // On appel la fonction qui supprimera le message d'erreur et repassera regexError à false
+        return false
+    }
+}
 
+function submitFormForCommand(form) {
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();// On annule le comportement par défault
+
+
+
+
+
+        if (!checkForCart()) {// On vérifie si le panier existe, si il n'exispte pas
+            alert('Votre panier est vide, veuillez compléter votre panier avant de commander celui-ci!');// On prévient l'utilisateur qu'il n'existe pas
+            return false; // On ne va pas plus loin
+
+        } else if (
+            regexError ||
+            regexDoubleCheck(formCommand['firstName'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg) ||
+            regexDoubleCheck(formCommand['lastName'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg) ||
+            regexDoubleCheck(formCommand['address'], regexCheckList.addressUnexpectedCharacter, regexCheckList.addressStart, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.addressStartMsg) ||
+            regexDoubleCheck(formCommand['city'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg)
+        ) { // On vérifie si l'on a une erreur de saisi de l'utilisateur , au quel cas
+            alert('Veuillez compléter les champs correctement'); // On prévient l'utilisateur
+            return false // On ve va pas plus loin
+
+        } else { // Si le panier existe et qu'il n'y a pas d'erreur
+
+            panier = importCart();
+
+            let contact = { // On créer contact qui contiendra tout les informations saisi par l'utilisateur
+                "firstName": form["firstName"].value,
+                "lastName": form["lastName"].value,
+                "address": form["address"].value,
+                "city": form["city"].value,
+                "email": form["email"].value
+            };
+
+            let products = []; // On créer products qui sera un array qui contiendra toutes les id des produits présent dans le panier
+
+            for (let kanapInPanier of panier) { // On fait une bouvle qui va parcourir tout les éléments du panier et push leur "id" dans product
+                products.push(kanapInPanier.id);
+            };
+
+            let command = { "contact": contact, "products": products }; // On créer command qui contiendra contact et products
+
+            sessionStorage.setItem('command', JSON.stringify(command)); // On stock command dans le sessionStorage
+
+            window.location.href = "./confirmation.html"; // Pour finir on redirige l'utilisateur sur la page de confirmation
+        }
+
+    })
+}
+
+//-------------------------------- CODE Parti Panier --------------------------------//
+
+
+if (checkForCart()) { // Si le panier existe
+
+    panier = importCart(); // On le transforme en objet utilisable 
+
+    getAllProductsFromCart(panier);
+
+}
 
 //------------------------------ CODE Parti Formulaire ------------------------------//
 
-regexDoubleCheck(formCommand['firstName'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg);
+regexDynamicCheck(formCommand['firstName'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg);
 
-regexDoubleCheck(formCommand['lastName'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg);
+regexDynamicCheck(formCommand['lastName'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg);
 // On check l'adresse
-regexDoubleCheck(formCommand['address'], regexCheckList.addressUnexpectedCharacter, regexCheckList.addressStart, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.addressStartMsg);
+regexDynamicCheck(formCommand['address'], regexCheckList.addressUnexpectedCharacter, regexCheckList.addressStart, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.addressStartMsg);
 // On check la ville
-regexDoubleCheck(formCommand['city'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg);
+regexDynamicCheck(formCommand['city'], regexCheckList.unexpectedCharacter, regexCheckList.moreThanTreeCharacter, regexErrorMsg.unexpectedCharacterMsg, regexErrorMsg.moreThanTreeCharacterMsg);
 // On check l'email 
 //regexDoubleCheck(formCommand['email'], regexCheckList.emailUnexpectedCharacter, !regexCheckList.emailConform, regexErrorMsg.emailUnexpectedCharacterMsg, regexErrorMsg.emailConformMsg)
 
 formCommand['email'].addEventListener('input', function () {
-    resetRegex(this);
-    if (regexCheckList.emailUnexpectedCharacter.exec(this.value)) {
-        regexError = true;
-        showErrorMsg(this, regexErrorMsg.emailUnexpectedCharacterMsg);
-    } else if (!regexCheckList.emailConform.exec(this.value)) {
-        regexError = true;
-        showErrorMsg(this, regexErrorMsg.emailConformMsg);
+    if (checkForRegexError(this, regexCheckList.emailUnexpectedCharacter, regexErrorMsg.emailUnexpectedCharacterMsg)) {
+        regexError = getRegexError(this, regexErrorMsg.emailUnexpectedCharacterMsg)
+    } else if (!checkForRegexError(this, regexCheckList.emailConform, regexErrorMsg.emailConformMsg)) {
+        regexError = getRegexError(this, regexErrorMsg.emailConformMsg)
     } else {
-        resetRegex(this);
+        regexError = false;
+        resetErrorMsg(this);
     }
 });
 
-//A l'envoie du formulaire
-formCommand.addEventListener('submit', function (e) {
-    e.preventDefault();// On annule le comportement par défault
-    if (!sessionStorage.panierOfKanap9959 || !JSON.parse(sessionStorage.panierOfKanap9959)[0]) {// On vérifie si le panier existe, si il n'exispte pas
-        alert('Votre panier est vide, veuillez compléter votre panier avant de commander celui-ci!');// On prévient l'utilisateur qu'il n'existe pas
-        return false; // On ne va pas plus loin
-
-    } else if (regexError) { // On vérifie si l'on a une erreur de saisi de l'utilisateur , au quel cas
-        alert('Veuillez compléter les champ correctement'); // On prévient l'utilisateur
-        return false // Et on ve va pas plus loin
-
-    } else { // Si le panier existe et qu'il n'y a pas d'erreur
-
-        let contact = { // On créer contact qui contiendra tout les informations saisi par l'utilisateur
-            "firstName": this["firstName"].value,
-            "lastName": this["lastName"].value,
-            "address": this["address"].value,
-            "city": this["city"].value,
-            "email": this["email"].value
-        };
-
-        let products = []; // On créer products qui sera un array qui contiendra tout les id des produit présent dans le panier
-
-        for (let kanapInPanier of JSON.parse(sessionStorage.panierOfKanap9959)) { // On fait une bouvle qui va parcourir tout les éléments du panier et push leur "id" dans product
-            products.push(kanapInPanier.id);
-        };
-
-        let command = { "contact": contact, "products": products }; // On créer command qui contiendra contact et products
-
-        sessionStorage.setItem('command', JSON.stringify(command)); // On stock command dans le sessionStorage
-
-        window.location.href = "./confirmation.html"; // Pour finir on redirige l'utilisateur sur la page de confirmation
-    }
-
-})
+submitFormForCommand(formCommand);
